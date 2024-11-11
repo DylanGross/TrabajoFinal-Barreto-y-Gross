@@ -5,6 +5,8 @@ public class TicketsDbContext : DbContext
     public DbSet<Tarea> Tareas { get; set; }
     public DbSet<Comentario> Comentarios { get; set; }
     public DbSet<Estado> Estados {get; set;}
+    public DbSet<CambioEstado> CambiosEstado { get; set; }
+
 
     public TicketsDbContext(DbContextOptions<TicketsDbContext> options) : base(options)
     {
@@ -22,6 +24,8 @@ public class TicketsDbContext : DbContext
         });
 
     }
+
+    
 
 
 

@@ -86,4 +86,18 @@ public class TareaController : ControllerBase
 
         return Ok(tareas);
     }
+
+    [HttpGet("cambiosestado/{tareaId}")]
+    public IActionResult GetCambiosEstadoByTareaId(int tareaId)
+    {
+        var cambiosEstado = _tareaService.GetCambiosEstadoByTareaId(tareaId);
+        
+        if (cambiosEstado == null || !cambiosEstado.Any())
+        {
+            return NotFound("No se encontraron cambios de estado para la tarea especificada.");
+        }
+
+        return Ok(cambiosEstado);
+    }
+
 }

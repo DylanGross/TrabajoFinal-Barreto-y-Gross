@@ -121,18 +121,34 @@ public class TareaDbService : ITareaService
             throw new UnauthorizedAccessException("Solo el técnico asignado puede modificar esta tarea.");
         }
 
+        // Registrar el cambio de estado si ha cambiado el estado
+        if (t.EstadoId != tareaExistente.EstadoId)
+        {
+            var cambioEstado = new CambioEstado
+            {
+                TareaId = tareaExistente.Id,
+                EstadoAnteriorId = tareaExistente.EstadoId,
+                EstadoNuevoId = t.EstadoId,
+                FechaCambio = DateTime.Now,
+                UsuarioId = t.UsuarioId,
+            };
+
+            _context.CambiosEstado.Add(cambioEstado); // Registrar el cambio
+        }
+
         // Actualizar la tarea con los nuevos datos
         tareaExistente.Titulo = t.Titulo;
-        tareaExistente.EstadoId = t.EstadoId;
         tareaExistente.Descripcion = t.Descripcion;
         tareaExistente.TecnicoId = userId;
         tareaExistente.Fecha_modificacion = t.Fecha_modificacion;
+        tareaExistente.EstadoId = t.EstadoId; // Asegúrate de actualizar el estado
 
         _context.Entry(tareaExistente).State = EntityState.Modified;
         _context.SaveChanges();
 
         return tareaExistente;
     }
+
 
     public IEnumerable<Tarea> GetTareasByEstadoId(int estadoId)
     {
@@ -144,6 +160,20 @@ public class TareaDbService : ITareaService
 
         return tareas;
     }
+
+
+    // Método para obtener los cambios de estado de una tarea
+    public IEnumerable<CambioEstado> GetCambiosEstadoByTareaId(int tareaId)
+    {
+        // Cargar los cambios de estado para la tarea sin intentar incluir la relación de EstadoAnterior
+        var cambiosEstado = _context.CambiosEstado
+            .Where(c => c.TareaId == tareaId)
+            .ToList(); // Solo obtenemos los cambios de estado directamente
+
+        // Devuelve los cambios de estado obtenidos
+        return cambiosEstado;
+    }
+
 
 
 
